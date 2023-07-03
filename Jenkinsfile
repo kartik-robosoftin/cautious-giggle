@@ -22,5 +22,21 @@ pipeline {
                 }   
             }
         }
+
+        stage("Run unit tests") {
+            steps {
+                nodejs(nodeJSInstallationName: 'Node 16') {
+                    sh 'npm test'
+                }   
+            }
+        }
+
+        stage("Generate build") {
+            steps {
+                nodejs(nodeJSInstallationName: 'Node 16') {
+                    sh 'npm run build'
+                }   
+            }
+        }
     }
 }
