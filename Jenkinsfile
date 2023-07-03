@@ -23,20 +23,47 @@ pipeline {
             }
         }
 
-        stage("Run unit tests") {
-            steps {
-                nodejs(nodeJSInstallationName: 'Node 16') {
-                    sh 'npm test'
-                }   
+        stage("Run tests") {
+            parallel {
+                stage('Prettier test') {
+                    steps {
+                        nodejs(nodeJSInstallationName: 'Node 16') {
+                            sh 'npm run prettier:check'
+                        } 
+                    }
+                }
+                stage('Unit test') {
+                    steps {
+                        nodejs(nodeJSInstallationName: 'Node 16') {
+                            sh 'npm test'
+                        }   
+                    }
+                }
             }
         }
 
         stage("Generate build") {
+            when {
+                branch 'main'
+            }
             steps {
                 nodejs(nodeJSInstallationName: 'Node 16') {
                     sh 'npm run build'
                 }   
             }
         }
-    }
+
+        stage('Deploy to production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                timeout(time: 15, unit: "MINUTES") {
+                    input message: "Do you want to approve production deployment?", ok: 'Yes'
+                }
+
+                echo "Deploying...."
+            }
+        }
+     }
 }
