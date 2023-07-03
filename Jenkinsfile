@@ -16,11 +16,10 @@ pipeline {
     stages {
         stage("Install dependencies") {
             steps {
-                nodejs(nodeJSInstallationName: 'Node 16.x') {
-                    sh 'npm --version'
-                }
+                nodejs(nodeJSInstallationName: 'Node 16') {
                     sh 'npm --version'
                     sh 'npm ci'
+                }   
             }
         }
     }
