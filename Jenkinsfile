@@ -16,6 +16,7 @@ pipeline {
     stages {
         stage("Install dependencies") {
             steps {
+                gitHubCheckout('https://github.com/kartik-robosoftin/hacker-news', 'Jenkins-PAT', 'main')
                 nodejs(nodeJSInstallationName: 'Node 16') {
                     sh 'npm --version'
                     sh 'npm ci'
