@@ -17,7 +17,7 @@ pipeline {
         stage("Install dependencies") {
             steps {
                 setupNode('v16.16.0')
-                echo "node --version"
+                sh "node --version"
             }
         }
 
