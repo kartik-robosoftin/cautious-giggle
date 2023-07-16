@@ -16,7 +16,6 @@ pipeline {
     stages {
         stage("Install dependencies") {
             steps {
-                gitHubCheckout('https://github.com/kartik-robosoftin/hacker-news', 'Jenkins-PAT', 'main')
                 nodejs(nodeJSInstallationName: 'Node 16') {
                     sh 'npm --version'
                     sh 'npm ci'
@@ -45,7 +44,11 @@ pipeline {
 
         stage("Generate build") {
             when {
-                branch 'main'
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
+                
             }
             steps {
                 nodejs(nodeJSInstallationName: 'Node 16') {
@@ -56,14 +59,19 @@ pipeline {
 
         stage('Deploy to production') {
             when {
-                branch 'main'
+               anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
             }
             steps {
                 timeout(time: 15, unit: "MINUTES") {
                     input message: "Do you want to approve production deployment?", ok: 'Yes'
                 }
 
-                echo "Deploying...."
+                script {
+                    log.info("Deploying...")
+                }
             }
         }
      }
