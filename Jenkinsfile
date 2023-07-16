@@ -8,69 +8,37 @@ library(
 )
 
 pipeline {
-    agent any
+    agent none
     environment {
         APP_TOKEN = credentials('89ad9979-b168-48c6-8755-36e0fd445de0')
     }
 
-    stages {
-        stage("Install dependencies") {
+    stages { 
+        stage("Stage 1") {
+        agent { label 'agent1'}
             steps {
-                nodejs(nodeJSInstallationName: 'Node 16') {
-                    sh 'npm --version'
-                    sh 'npm ci'
-                }   
+                script {
+                    log.info("Running in agent1")
+                }  
             }
         }
 
-        stage("Run tests") {
+        stage("Stage 2") {
+            agent { label 'agent2'}
             parallel {
                 stage('Prettier test') {
                     steps {
-                        nodejs(nodeJSInstallationName: 'Node 16') {
-                            sh 'npm run prettier:check'
+                        script {
+                            log.info("Running in agent2")
                         } 
                     }
                 }
                 stage('Unit test') {
                     steps {
-                        nodejs(nodeJSInstallationName: 'Node 16') {
-                            sh 'npm test'
+                        script {
+                            log.info("Running in agent2")
                         }   
                     }
-                }
-            }
-        }
-
-        stage("Generate build") {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'develop'
-                }
-                
-            }
-            steps {
-                nodejs(nodeJSInstallationName: 'Node 16') {
-                    sh 'npm run build'
-                }   
-            }
-        }
-
-        stage('Deploy to production') {
-            when {
-               anyOf {
-                    branch 'main'
-                    branch 'develop'
-                }
-            }
-            steps {
-                timeout(time: 15, unit: "MINUTES") {
-                    input message: "Do you want to approve production deployment?", ok: 'Yes'
-                }
-
-                script {
-                    log.info("Deploying...")
                 }
             }
         }
