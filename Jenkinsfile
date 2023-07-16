@@ -25,22 +25,27 @@ pipeline {
 
         stage("Stage 2") {
             agent { label 'agent2'}
-            parallel {
-                stage('Prettier test') {
-                    steps {
-                        script {
-                            log.info("Running in agent2")
-                        } 
-                    }
-                }
-                stage('Unit test') {
-                    steps {
-                        script {
-                            log.info("Running in agent2")
-                        }   
+            stages {
+                stage('Parallel stage') {
+                    parallel {
+                        stage('Prettier test') {
+                            steps {
+                                script {
+                                    log.info("Running in agent2")
+                                } 
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                script {
+                                    log.info("Running in agent2")
+                                }   
+                            }
+                        }
                     }
                 }
             }
+            
         }
      }
 }
